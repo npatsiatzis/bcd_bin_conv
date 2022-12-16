@@ -10,7 +10,7 @@ tests_dir = os.path.abspath(os.path.dirname(__file__)) #gives the path to the te
 rtl_dir = tests_dir                                    #path to hdl folder where .vhdd files are placed
 
 
-#run 10 test with length generic values start = 10 end = 1000 step = 100
+#run tests with generic values for length
 @pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i+4),"g_bin_width": str(i)} for i in range(4,13,4)])
 def test_bin_bcd(parameter):
 
@@ -37,7 +37,7 @@ def test_bin_bcd(parameter):
 
 
                                    
-#run 10 test with length generic values start = 10 end = 1000 step = 100
+#run tests with generic values for length
 @pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i),"g_bin_width": str(i)} for i in range(4,17,4)])
 def test_bcd_bin(parameter):
 
