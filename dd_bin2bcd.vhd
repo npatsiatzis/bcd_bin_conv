@@ -1,3 +1,6 @@
+--Conversion between two binary encodings of decimal numbers.
+--Here from pure binary to Binary Coded Decimal (8421 code).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
