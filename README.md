@@ -1,8 +1,8 @@
 
-### barrel-shifter RTL implementation
+### RTL implementation for conversion from bcd to binary and vice versa
 
 
-- 32-bits barrel shifter
-- performs SRL, SRA, SLL/SLA operations
+- conversion based on the double dabble algorithm
+- purely combinational implementation that can be pipelined appropriately for timing considerations
 - CoCoTB testbench for functional verification
 
