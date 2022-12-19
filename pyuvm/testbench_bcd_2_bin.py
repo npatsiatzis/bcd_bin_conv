@@ -3,8 +3,9 @@ from pyuvm import *
 import random
 import cocotb
 import pyuvm
-from utils import AdderBfm
-from adder_model import adder_model
+from utils import BcdBinBfm
+from cocotb.binary import BinaryValue
+
 
 
 g_bcd_width = int(cocotb.top.g_bcd_width)
@@ -17,38 +18,69 @@ def max_bcd_number():
     return(int(max_bcd))
 max_bcd=max_bcd_number()
 
+def bcd_to_4bits(bcd_digit):
+    a = format(bcd_digit,'b')
+    if(len(a) < 4):
+        diff = 4 -len(a)
+        for i in range(diff):
+            a = '0' + a
+    return a
+
+
+def digits_of_integer(p_int):
+    digits = []
+
+    p_str = str(p_int)
+    for i in range(len(p_str)):
+        digits.append(int(p_str[i]))
+    return digits
+
+def bcd_2_bin(p_bcd):
+    digits = ""
+    for i in range(int(g_bcd_width/4)):
+        digits = digits + str(int(p_bcd[i*4:i*4+3]))
+    return int(digits)
+
+def bin_2_bcd(p_bin):
+    bcd_digits = digits_of_integer(p_bin)
+    bin_strings = []
+    zero_string = '0000'
+    if(len(bcd_digits) < (g_bcd_width/4)):
+        diff = int(g_bcd_width/4) - len(bcd_digits) 
+        for i in range(diff):
+            bin_strings.insert(0,zero_string)
+    for i in bcd_digits:
+        bin_strings.append(bcd_to_4bits(i))
+
+    i_bcd = ""
+    for i in bin_strings:
+        i_bcd = i_bcd + i
+    return BinaryValue(i_bcd)
+
 
 # Sequence classes
-class AluSeqItem(uvm_sequence_item):
+class SeqItem(uvm_sequence_item):
 
     def __init__(self, name, bcd):
         super().__init__(name)
         self.bcd = bcd
-        # self.A = aa
-        # self.B = bb
+
 
     def randomize_operands(self):
         self.bcd = random.randint(0,max_bcd)
-        # self.A = random.randint(0, 2**g_data_width-1)
-        # self.B = random.randint(0, 2**g_data_width-1)
 
     def randomize(self):
         self.randomize_operands()
 
     def __eq__(self, other):
         same = self.bcd == other.bcd
-        # same = self.A == other.A and self.B == other.B 
         return same
-
-    # def __str__(self):
-    #     return f"{self.get_name()} : A: 0x{self.A:02x} \
-    #     B: 0x{self.B:02x}"
 
 
 class RandomSeq(uvm_sequence):
     async def body(self):
         while(len(covered_values) != max_bcd):
-            data_tr = AluSeqItem("data_tr", None, None)
+            data_tr = SeqItem("data_tr", None)
             await self.start_item(data_tr)
             data_tr.randomize_operands()
             while(data_tr.bcd in covered_values):
@@ -69,7 +101,7 @@ class Driver(uvm_driver):
         self.ap = uvm_analysis_port("ap", self)
 
     def start_of_simulation_phase(self):
-        self.bfm = AdderBfm()
+        self.bfm = BcdBinBfm()
 
     async def launch_tb(self):
         await self.bfm.reset()
@@ -79,7 +111,8 @@ class Driver(uvm_driver):
         await self.launch_tb()
         while True:
             data = await self.seq_item_port.get_next_item()
-            await self.bfm.send_data(data.bcd)
+            bcd_data = bin_2_bcd(data.bcd)
+            await self.bfm.send_data(bcd_data)
             result = await self.bfm.get_result()
             self.ap.write(result)
             data.result = result
@@ -93,8 +126,9 @@ class Coverage(uvm_subscriber):
 
     def write(self, data):
         bcd = data
-        if(int(bcd) not in self.cvg):
-            self.cvg.add(int(bcd))
+        int = bcd_2_bin(bcd)
+        if(bcd_2_bin(bcd) not in self.cvg):
+            self.cvg.add(int)
 
     def report_phase(self):
         try:
@@ -139,13 +173,11 @@ class Scoreboard(uvm_component):
                 self.logger.critical(f"result {actual_result} had no command")
             else:
                 bcd = data
-                predicted_result = adder_model(A, B)
-                if predicted_result == actual_result:
+                if bcd_2_bin(bcd) == int(actual_result):
                     pass
-                    self.logger.info("PASSED: {} + {} = {}".format(int(A),int(B),int(actual_result)))
+                    self.logger.info("PASSED:")
                 else:
-                    self.logger.error("FAILED: {} + {} = {}, exepcted {}"\
-                        .format(int(A),int(B),int(actual_result),predicted_result))
+                    self.logger.error("FAILED:")
 
                     passed = False
         assert passed
@@ -158,8 +190,7 @@ class Monitor(uvm_component):
 
     def build_phase(self):
         self.ap = uvm_analysis_port("ap", self)
-        self.bfm = AdderBfm()
-        # self.bfm = TinyAluBfm()
+        self.bfm = BcdBinBfm()
         self.get_method = getattr(self.bfm, self.method_name)
 
     async def run_phase(self):
@@ -169,7 +200,7 @@ class Monitor(uvm_component):
             self.ap.write(datum)
 
 
-class AluEnv(uvm_env):
+class Env(uvm_env):
 
     def build_phase(self):
         self.seqr = uvm_sequencer("seqr", self)
@@ -187,11 +218,11 @@ class AluEnv(uvm_env):
 
 
 @pyuvm.test()
-class AluTest(uvm_test):
-    """Test ALU with random values"""
+class Test(uvm_test):
+    """Test Bcd 2 Bin with random values"""
 
     def build_phase(self):
-        self.env = AluEnv("env", self)
+        self.env = Env("env", self)
 
     def end_of_elaboration_phase(self):
         self.test_all = TestAllSeq.create("test_all")
