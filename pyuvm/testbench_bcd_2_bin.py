@@ -1,4 +1,5 @@
 from cocotb.triggers import Timer
+from cocotb_coverage import crv
 from pyuvm import *
 import random
 import cocotb
@@ -25,7 +26,6 @@ def bcd_to_4bits(bcd_digit):
         for i in range(diff):
             a = '0' + a
     return a
-
 
 def digits_of_integer(p_int):
     digits = []
@@ -57,24 +57,22 @@ def bin_2_bcd(p_bin):
         i_bcd = i_bcd + i
     return BinaryValue(i_bcd)
 
+class crv_inputs(crv.Randomized):
+    def __init__(self,bcd):
+        crv.Randomized.__init__(self)
+        self.bcd = bcd
+        self.add_rand("bcd",list(range(max_bcd)))
 
 # Sequence classes
 class SeqItem(uvm_sequence_item):
 
     def __init__(self, name, bcd):
         super().__init__(name)
-        self.bcd = bcd
+        self.i_crv = crv_inputs(bcd)
 
 
     def randomize_operands(self):
-        self.bcd = random.randint(0,max_bcd)
-
-    def randomize(self):
-        self.randomize_operands()
-
-    def __eq__(self, other):
-        same = self.bcd == other.bcd
-        return same
+        self.i_crv.randomize()
 
 
 class RandomSeq(uvm_sequence):
@@ -83,9 +81,9 @@ class RandomSeq(uvm_sequence):
             data_tr = SeqItem("data_tr", None)
             await self.start_item(data_tr)
             data_tr.randomize_operands()
-            while(data_tr.bcd in covered_values):
+            while(data_tr.i_crv.bcd in covered_values):
                 data_tr.randomize_operands()
-            covered_values.append(data_tr.bcd)
+            covered_values.append(data_tr.i_crv.bcd)
             await self.finish_item(data_tr)
 
 
@@ -111,7 +109,7 @@ class Driver(uvm_driver):
         await self.launch_tb()
         while True:
             data = await self.seq_item_port.get_next_item()
-            bcd_data = bin_2_bcd(data.bcd)
+            bcd_data = bin_2_bcd(data.i_crv.bcd)
             await self.bfm.send_data(bcd_data)
             result = await self.bfm.get_result()
             self.ap.write(result)
