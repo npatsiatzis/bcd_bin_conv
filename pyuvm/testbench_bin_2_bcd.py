@@ -1,5 +1,6 @@
 from cocotb.triggers import Timer
 from cocotb_coverage import crv
+from cocotb_coverage.coverage import CoverCross,CoverPoint,coverage_db
 from pyuvm import *
 import random
 import cocotb
@@ -7,9 +8,18 @@ import pyuvm
 from utils import BinBcdBfm
 
 
+
 g_bin_width = int(cocotb.top.g_bin_width)
 g_bcd_width = int(cocotb.top.g_bcd_width)
 covered_values = []
+
+
+# at_least = value is superfluous, just shows how you can determine the amount of times that
+# a bin must be hit to considered covered
+@CoverPoint("top.bin",xf = lambda x : x, bins = list(range(2**g_bin_width)), at_least=1)
+def number_cover(x):
+    pass
+
 
 def bcd_to_dec(bcd):
     dec = ""
@@ -81,6 +91,7 @@ class Coverage(uvm_subscriber):
 
     def write(self, data):
         bin = data
+        number_cover(bin)
         if(int(bin) not in self.cvg):
             self.cvg.add(int(bin))
 
@@ -185,4 +196,8 @@ class Test(uvm_test):
         self.raise_objection()
         await self.test_all.start()
         await Timer(2,units = 'ns') # to do last transaction
+
+
+        coverage_db.report_coverage(cocotb.log.info,bins=True)
+        coverage_db.export_to_xml(filename="coverage_bin_bcd.xml") 
         self.drop_objection()

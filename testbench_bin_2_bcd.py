@@ -54,4 +54,7 @@ async def test(dut):
 		coverage_db["top.bin"].add_threshold_callback(notify_full, 100)
 		assert not (bin_input != bcd_to_dec(dut.o_bcd.value)),"Actual behavior different than the expected one"
 
+	coverage_db.report_coverage(cocotb.log.info,bins=True)
+	coverage_db.export_to_xml(filename="coverage_bin_bcd.xml") 
+
 

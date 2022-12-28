@@ -86,4 +86,7 @@ async def test(dut):
 
 		assert not (bcd != dut.o_bin.value),"Actual behavior different than the expected one"
 
+	coverage_db.report_coverage(cocotb.log.info,bins=True)
+	coverage_db.export_to_xml(filename="coverage_bcd_bin.xml") 
+
 

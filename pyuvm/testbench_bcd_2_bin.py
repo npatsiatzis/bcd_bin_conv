@@ -6,6 +6,7 @@ import cocotb
 import pyuvm
 from utils import BcdBinBfm
 from cocotb.binary import BinaryValue
+from cocotb_coverage.coverage import CoverCross,CoverPoint,coverage_db
 
 
 
@@ -18,6 +19,14 @@ def max_bcd_number():
         max_bcd = max_bcd+"9"
     return(int(max_bcd))
 max_bcd=max_bcd_number()
+
+
+# at_least = value is superfluous, just shows how you can determine the amount of times that
+# a bin must be hit to considered covered
+@CoverPoint("top.bcd",xf = lambda x : x, bins = list(range(0,max_bcd)), at_least=1)
+def number_cover(x):
+    pass
+
 
 def bcd_to_4bits(bcd_digit):
     a = format(bcd_digit,'b')
@@ -125,6 +134,7 @@ class Coverage(uvm_subscriber):
     def write(self, data):
         bcd = data
         int = bcd_2_bin(bcd)
+        number_cover(int)
         if(bcd_2_bin(bcd) not in self.cvg):
             self.cvg.add(int)
 
@@ -229,4 +239,7 @@ class Test(uvm_test):
         self.raise_objection()
         await self.test_all.start()
         await Timer(2,units = 'ns') # to do last transaction
+
+        coverage_db.report_coverage(cocotb.log.info,bins=True)
+        coverage_db.export_to_xml(filename="coverage_bcd_bin.xml") 
         self.drop_objection()

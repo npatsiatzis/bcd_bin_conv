@@ -38,7 +38,7 @@ def test_bin_bcd(parameter):
 
                                    
 #run tests with generic values for length
-@pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i),"g_bin_width": str(i)} for i in range(4,17,4)])
+@pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i),"g_bin_width": str(i)} for i in range(4,13,4)])
 def test_bcd_bin(parameter):
 
     module = "testbench_bcd_2_bin"
