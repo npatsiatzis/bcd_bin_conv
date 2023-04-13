@@ -17,7 +17,7 @@ def test_bin_bcd(parameter):
     module = "testbench_bin_2_bcd"
     toplevel = "dd_bin2bcd"   
     vhdl_sources = [
-    os.path.join(rtl_dir, "dd_bin2bcd.vhd"),
+    os.path.join(rtl_dir, "../rtl/dd_bin2bcd.vhd"),
     ]
 
 
@@ -34,35 +34,3 @@ def test_bin_bcd(parameter):
         sim_build="sim_build/"
         + "_".join(("{}={}".format(*i) for i in parameter.items())),
     )
-
-
-                                   
-#run tests with generic values for length
-@pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i),"g_bin_width": str(i)} for i in range(4,13,4)])
-def test_bcd_bin(parameter):
-
-    module = "testbench_bcd_2_bin"
-    toplevel = "dd_bcd2bin"   
-    vhdl_sources = [
-        os.path.join(rtl_dir, "dd_bcd2bin.vhd"),
-        ]
-
-
-
-    run(
-        python_search=[tests_dir],                         #where to search for all the python test files
-        vhdl_sources=vhdl_sources,
-        toplevel=toplevel,
-        module=module,
-
-        vhdl_compile_args=[vhdl_compile_args],
-   		toplevel_lang="vhdl",
-        parameters=parameter,                              #parameter dictionary
-   		extra_env=parameter,
-        sim_build="sim_build/"
-        + "_".join(("{}={}".format(*i) for i in parameter.items())),
-    )
-
-    # if __name__ == "__main__":
-    # 	test_bin_bcd(parameter)
-    #     test_bcd_bin(parameter)

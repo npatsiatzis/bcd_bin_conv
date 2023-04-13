@@ -1,7 +1,5 @@
 ![example workflow](https://github.com/npatsiatzis/bcd_bin_conv/actions/workflows/regression.yml/badge.svg)
 ![example workflow](https://github.com/npatsiatzis/bcd_bin_conv/actions/workflows/coverage.yml/badge.svg)
-![example workflow](https://github.com/npatsiatzis/bcd_bin_conv/actions/workflows/regression_pyuvm.yml/badge.svg)
-![example workflow](https://github.com/npatsiatzis/bcd_bin_conv/actions/workflows/coverage_pyuvm.yml/badge.svg)
 
 ### RTL implementation for conversion from bcd to binary and vice versa
 
