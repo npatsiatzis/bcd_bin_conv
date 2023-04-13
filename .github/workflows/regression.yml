@@ -38,4 +38,5 @@ jobs:
     
     - name: regression
       run: |
-        SIM=ghdl pytest -n auto -o log_cli=True --junitxml=test-results.xml --cocotbxml=test-cocotb.xml test_bcd_bin.py
+        SIM=ghdl pytest -n auto -o log_cli=True --junitxml=test-results.xml --cocotbxml=test-cocotb.xml bcd_2_bin/cocotb_sim/test_bcd_bin.py
+        SIM=ghdl pytest -n auto -o log_cli=True --junitxml=test-results.xml --cocotbxml=test-cocotb.xml bin_2_bcd/cocotb_sim/test_bcd_bin.py
