@@ -37,9 +37,12 @@ jobs:
         ghdl --version
         $GHDL --version
     
-    - name: regression
+    - name: regression bcd_2_bin
       run: |
         cd bcd_2_bin/cocotb_sim/ && make bcd_2_bin
+        
+    - name: regression bin_2_bcd
+      run: |
         cd bin_2_bcd/cocotb_sim/ && make bin_2_bcd
       
     - name: Functional Coverage
