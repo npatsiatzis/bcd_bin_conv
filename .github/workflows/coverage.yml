@@ -39,12 +39,12 @@ jobs:
     
     - name: regression
       run: |
-        make bcd_2_bin
-        make bin_2_bcd
+        cd bcd_2_bin/cocotb_sim/ && make bcd_2_bin
+        cd bin_2_bcd/cocotb_sim/ && make bin_2_bcd
       
     - name: Functional Coverage
       run: |
-        var1=$(cat coverage_bcd_bin.xml | grep -o -E 'cover_percentage.{0,5}' | head -1 | cut -f2- -d\")
+        cd bcd_2_bin/cocotb_sim/ && var1=$(cat coverage_bcd_bin.xml | grep -o -E 'cover_percentage.{0,5}' | head -1 | cut -f2- -d\")
         if [ $var1 = 100 ]; then exit 0; else exit 1; fi
-        var2=$(cat coverage_bin_bcd.xml | grep -o -E 'cover_percentage.{0,5}' | head -1 | cut -f2- -d\")
+        cd bin_2_bcd/cocotb_sim/ && var2=$(cat coverage_bin_bcd.xml | grep -o -E 'cover_percentage.{0,5}' | head -1 | cut -f2- -d\")
         if [ $var2 = 100 ]; then exit 0; else exit 1; fi
