@@ -17,7 +17,7 @@ def test_bcd_bin(parameter):
     module = "tb_bcd_2_bin"
     toplevel = "dd_bcd2bin"   
     vhdl_sources = [
-        os.path.join(rtl_dir, "../rtl/dd_bcd2bin.vhd"),
+        os.path.join(rtl_dir, "../rtl/VHDL/dd_bcd2bin.vhd"),
         ]
 
 
