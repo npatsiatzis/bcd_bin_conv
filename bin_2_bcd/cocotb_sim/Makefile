@@ -6,7 +6,7 @@ TOPLEVEL_LANG ?= vhdl
 EXTRA_ARGS += --std=08
 SIM_ARGS += --wave=wave.ghw
 
-VHDL_SOURCES += $(PWD)/../rtl/dd_bin2bcd.vhd
+VHDL_SOURCES += $(PWD)/../rtl/VHDL/dd_bin2bcd.vhd
 # use VHDL_SOURCES for VHDL files
 
 bin_2_bcd:

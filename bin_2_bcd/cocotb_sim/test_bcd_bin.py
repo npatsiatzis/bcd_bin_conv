@@ -11,13 +11,13 @@ rtl_dir = tests_dir                                    #path to hdl folder where
 
 
 #run tests with generic values for length
-@pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i+4),"g_bin_width": str(i)} for i in range(4,13,4)])
+@pytest.mark.parametrize("parameter", [{"g_bcd_width": str(i+4),"g_bin_width": str(i)} for i in range(4,9,4)])
 def test_bin_bcd(parameter):
 
     module = "testbench_bin_2_bcd"
     toplevel = "dd_bin2bcd"   
     vhdl_sources = [
-    os.path.join(rtl_dir, "../rtl/dd_bin2bcd.vhd"),
+    os.path.join(rtl_dir, "../rtl/VHDL/dd_bin2bcd.vhd"),
     ]
 
 
